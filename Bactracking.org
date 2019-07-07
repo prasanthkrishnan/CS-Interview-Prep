@@ -1,0 +1,11 @@
+#+TITLE: Backtracking
+#+AUTHOR: Prasanth Krishnan
+#+EMAIL: knp281192@gmail.com
+
+* What is Backtracking?
+
+* When to use Backtracking?
+
+* General Structure
+
+* Examples
