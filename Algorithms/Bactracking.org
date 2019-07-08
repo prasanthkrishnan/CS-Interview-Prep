@@ -43,7 +43,6 @@ Backtracking constructs a tree of partial solutions, where each vertex represent
 #+END_SRC
 
 * Examples
-
 ** Permutations
 LeetCode: [[https://leetcode.com/problems/permutations/][Permutations]]
 
@@ -103,7 +102,7 @@ class Solution {
 ** Subsets / Combinations
 LeetCode: [[https://leetcode.com/problems/subsets/][Subsets]]
 
-#+BEGIN_SRC python
+#+BEGIN_SRC java
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,5 +147,411 @@ class Solution {
     private boolean accept(int pos, int nums) {
         return pos == nums;
     }
+}
+#+END_SRC
+
+** Generate Parentheses
+LeetCode: [[https://leetcode.com/problems/subsets/][Generate Parentheses]]
+
+#+BEGIN_SRC java
+class Solution {
+    List<String> res;
+    public List<String> generateParenthesis(int n) {
+        res = new ArrayList<>();
+        bt("",0,0, n);
+        return res;
+    }
+
+    private void bt(String p, int open, int close, int n) {
+        if(accept(p, open, close, n)) {
+            res.add(p);
+            return;
+        }
+        if(open < n)
+            bt(p + '(', open + 1, close, n);
+        if(close < open)
+            bt(p + ')', open, close + 1, n);
+    }
+
+    private boolean accept(String b, int open, int close, int n) {
+        if(b.length() != 2*n)
+            return false;
+        if(open != n)
+            return false;
+        if(close != open)
+            return false;
+        return true;
+    }
+
+    private List<Character> candidates(String b, int open, int close, int n) {
+        List<Character> candidates = new ArrayList<>(2);
+        if(open < n)
+            candidates.add('(');
+        if(close < open)
+            candidates.add(')');
+        return candidates;
+    }
+}
+#+END_SRC
+
+** Sudoku Solver
+LeetCode: [[https://leetcode.com/problems/subsets/][Sudoku Solver]]
+
+#+BEGIN_SRC java
+class Solution {
+
+    // row[1][9] = true means in first row value 9 is present.
+    boolean[][] row = new boolean[9][10];
+    boolean[][] col = new boolean[9][10];
+    boolean[][] box = new boolean[9][10];
+    char[][] board;
+    int free = 81;
+
+    private int boxIdx(int i, int j) {
+        return (i / 3) * 3 + (j / 3);
+    }
+
+    private boolean placeNum(int i, int j, int d) {
+        int boxIdx = boxIdx(i, j);
+        boolean canPlace = !row[i][d] && !col[j][d] && !box[boxIdx][d];
+        if (canPlace) {
+            row[i][d] = true;
+            col[j][d] = true;
+            box[boxIdx][d] = true;
+            --free;
+            board[i][j] = (char) ('0' + d);
+        }
+        return canPlace;
+    }
+
+    private boolean placeNum(int i, int j, char c) {
+        int d = c - '0';
+        return placeNum(i, j, d);
+    }
+
+    private void removeNum(int i, int j, int d) {
+        int boxIdx = boxIdx(i, j);
+        row[i][d] = false;
+        col[j][d] = false;
+        box[boxIdx][d] = false;
+        ++free;
+        board[i][j] = '.';
+    }
+
+    private boolean[] candidates(int i, int j) {
+        boolean[] candidates = new boolean[10];
+        int boxIdx = boxIdx(i, j);
+        for (int k = 0; k < 10; ++k) {
+            candidates[k] = !row[i][k] && !col[j][k] && !box[boxIdx][k];
+        }
+        return candidates;
+    }
+
+    private void moveToNextCell(int i, int j) {
+        if (i < 0 || i > 8) {
+            return;
+        }
+        if (j < 0 || j > 8) {
+            return;
+        }
+        if (j != 8) {
+            bt(i, j + 1); // move to next column
+        } else {
+            bt(i + 1, 0); // move to next row at the end of the column
+        }
+    }
+
+    private void bt(int i, int j) {
+
+        if (free == 0) {
+            return;
+        } else if (i < 0 || i > 8) {
+            return;
+        } else if (j < 0 || j > 8) {
+            return;
+        } else if (board[i][j] != '.') {
+            moveToNextCell(i, j);
+        } else {
+            // print();
+            boolean[] candidates = candidates(i, j);
+            for (int k = 0; k < candidates.length; ++k) {
+                if (candidates[k]) {
+                    placeNum(i, j, k);
+                    moveToNextCell(i, j);
+                    if (free == 0) {
+                        break;
+                    }
+                    removeNum(i, j, k);
+                }
+            }
+        }
+    }
+
+    public void solveSudoku(char[][] board) {
+        this.board = board;
+        for (int i = 0; i < 9; ++i) {
+            row[i][0] = true;
+            box[i][0] = true;
+            col[i][0] = true;
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] != '.') {
+                    placeNum(i, j, board[i][j]);
+                }
+            }
+        }
+        bt(0, 0);
+    }
+}
+#+END_SRC
+
+** Combination Sum
+LeetCode: [[https://leetcode.com/problems/subsets/][Combination Sum]]
+
+#+BEGIN_SRC java
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+
+    private List<List<Integer>> res;
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        res = new ArrayList<>();
+        bt(new ArrayList<>(), 0, candidates, 0, target);
+        return res;
+    }
+
+    private void bt(List<Integer> partialSolution, int partialSolutionSum, int[] candidates, int startIdx, int target) {
+
+        if (partialSolutionSum > target) {
+            return;
+        } else if (accept(partialSolutionSum, target)) {
+            res.add(new ArrayList<>(partialSolution));
+        } else {
+            for(int i = startIdx; i < candidates.length; ++i) {
+                partialSolution.add(candidates[i]);
+                // startIdx is not incremented, since the same number can be reused multiple times.
+                bt(partialSolution, partialSolutionSum + candidates[i], candidates, i, target);
+                partialSolution.remove(partialSolution.size() - 1);
+            }
+        }
+    }
+
+    private boolean accept(int partialSolutionSum, int target) {
+        return partialSolutionSum == target;
+    }
+}
+#+END_SRC
+
+LeetCode:[[https://leetcode.com/problems/combination-sum-ii][Combination Sum 2]]
+
+#+BEGIN_SRC java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+
+    private List<List<Integer>> res;
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        res = new ArrayList<>();
+        Arrays.sort(candidates);
+        bt(new ArrayList<>(), 0, candidates, 0, target);
+        return res;
+    }
+
+    private void bt(List<Integer> partialSolution, int partialSolutionSum, int[] candidates, int startIdx, int target) {
+
+        if (partialSolutionSum > target) {
+            return;
+        } else if (accept(partialSolutionSum, target)) {
+            res.add(new ArrayList<>(partialSolution));
+        } else {
+            int prevCandidate = -1;
+            for(int i = startIdx; i < candidates.length; ++i) {
+            // There can be duplicates in candidates and duplicate numbers cant be used again for the same position in partialSolution,(produce duplicate solutions)
+            // so we sort them and avoid duplicates.
+                if (prevCandidate == candidates[i]) {
+                    prevCandidate = candidates[i];
+                    continue;
+                } else {
+                    prevCandidate = candidates[i];
+                }
+                partialSolution.add(candidates[i]);
+                // increment startIdx since same number can be used multiple times.
+                bt(partialSolution, partialSolutionSum + candidates[i], candidates, i + 1, target);
+                partialSolution.remove(partialSolution.size() - 1);
+            }
+        }
+    }
+
+    private boolean accept(int partialSolutionSum, int target) {
+        return partialSolutionSum == target;
+    }
+}
+#+END_SRC
+
+** N-Queens problem
+LeetCode: [[https://leetcode.com/problems/n-queens/solution/][N-Queens]]
+
+#+BEGIN_SRC java
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    List<List<String>> result;
+    char[] candidates = new char[]{'Q', '.'};
+    int numBlocked = 0;
+    int queensPlaced = 0;
+
+    public List<List<String>> solveNQueens(int n) {
+        result = new ArrayList<>();
+        int[] blocked = new int[n * n];
+        char[][] board = new char[n][n];
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; j++) {
+                blocked[i * n + j] = 0;
+                board[i][j] = '.';
+            }
+        }
+        numBlocked = 0;
+        queensPlaced = 0;
+        bt(blocked, board, 0, n);
+        return result;
+    }
+
+    private void bt(int[] blocked, char[][] board, int offset, int n) {
+        if (accept(queensPlaced, n)) {
+            addToResult(board, n);
+        } else if (numBlocked >= n * n) {
+            return;
+        } else {
+            int next = nextLocation(offset, blocked, n);
+            if (next >= n * n) {
+                return;
+            }
+            for (char c : candidates) {
+                makeMove(c, next, blocked, board, n);
+                bt(blocked, board, next + 1, n);
+                unMakeMove(c, next, blocked, board, n);
+            }
+        }
+
+    }
+
+    private void unMakeMove(char c, int next, int[] blocked, char[][] board, int n) {
+        if (c == '.') {
+            return;
+        }
+        int row = next / n;
+        int col = next % n;
+        queensPlaced--;
+        blocked[next] += 3; //need to subtract by 1; in the for loops below this cell gets -1 four times.
+        board[row][col] = '.';
+        // mark the row as unavailable
+        for (int i = 0; i < n; i++) {
+            if ((--blocked[row * n + i]) == 0) {
+                numBlocked--;
+            }
+        }
+        // mark the col as unavailable
+        for (int i = 0; i < n; i++) {
+            if ((--blocked[i * n + col]) == 0) {
+                numBlocked--;
+            }
+        }
+        // mark diagonal as unavailable
+        int con = row + col;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i + j == con) {
+                    if ((--blocked[i * n + j]) == 0) {
+                        numBlocked--;
+                    }
+                }
+            }
+        }
+        con = row - col;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i - j == con) {
+                    if ((--blocked[i * n + j]) == 0) {
+                        numBlocked--;
+                    }
+                }
+            }
+        }
+    }
+
+    private void makeMove(char c, int next, int[] blocked, char[][] board, int n) {
+        if (c == '.') {
+            return;
+        }
+        int row = next / n;
+        int col = next % n;
+        queensPlaced++;
+        blocked[next] -= 3;
+        board[row][col] = c;
+        // mark the row as blocked
+        for (int i = 0; i < n; i++) {
+            if ((++blocked[row * n + i]) == 1) {
+                numBlocked++;
+            }
+        }
+        // mark the col as blocked
+        for (int i = 0; i < n; i++) {
+            if ((++blocked[i * n + col]) == 1) {
+                numBlocked++;
+            }
+        }
+        // mark diagonal as blocked
+        int con = row + col;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i + j == con) {
+                    if ((++blocked[i * n + j]) == 1) {
+                        numBlocked++;
+                    }
+                }
+            }
+        }
+        con = row - col;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i - j == con) {
+                    if ((++blocked[i * n + j]) == 1) {
+                        numBlocked++;
+                    }
+                }
+            }
+        }
+        return;
+    }
+
+    private int nextLocation(int offset, int[] blocked, int n) {
+        int i = offset;
+        int limit = n * n;
+        while (i < limit && blocked[i] > 0) {
+            ++i;
+        }
+        return i;
+    }
+
+    private void addToResult(char[][] board, int n) {
+        List<String> stringBoard = new ArrayList<>(n);
+        StringBuilder sb;
+        for (int i = 0; i < n; ++i) {
+            sb = new StringBuilder(n);
+            for (int j = 0; j < n; j++) {
+                sb.append(board[i][j]);
+            }
+            stringBoard.add(sb.toString());
+        }
+        result.add(stringBoard);
+    }
+
+    private boolean accept(int queensPlaced, int n) {
+        return queensPlaced == n;
+    }
+
 }
 #+END_SRC
