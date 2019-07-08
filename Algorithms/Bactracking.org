@@ -2,12 +2,44 @@
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
 #+DESCRIPTION: This file contains my notes and coding samples for the topic Backtracking.
+#+OPTIONS: toc:2
 
 * What is Backtracking?
-Backtracking is a technique for listing all possible solutions for a combinatorial problem. It is a systematic way to iterate through all the possible configurations of a search space. These configurations may represent all possible arrangementsof objects (permutations) or all possible ways of building a collection of them(subsets). It finds all (or some) solutions to combinatorial problems, by incrementally building candidates to the valid solutions, and abandons a candidate ("backtracks") as soon as it determines that the candidate cannot possibly be completed to a valid solution.
+Backtracking is a technique for listing all possible solutions for a combinatorial problem. It is a systematic way to iterate through all the possible configurations of a search space. These configurations may represent all possible arrangements of objects (permutations) or all possible ways of building a collection of them(subsets). It finds all (or some) solutions to combinatorial problems, by incrementally building candidates to the valid solutions, and abandons a candidate ("backtracks") as soon as it determines that the candidate cannot possibly be completed to a valid solution.
 
 * When to use Backtracking?
+Backtracking can be applied only for problems which admit the concept of a "partial candidate solution" and a relatively quick test of whether it can possibly be completed to a valid solution. It is useless, for example, for locating a given value in an unordered table. When it is applicable, however, backtracking is often much faster than brute force enumeration of all complete candidates, since it can eliminate a large number of candidates with a single test.
+
+Backtracking is an important tool for solving constraint satisfaction problems, such as crosswords, verbal arithmetic, Sudoku, and many other puzzles. It is often the most convenient (if not the most efficient) technique for parsing, for the knapsack problem and other combinatorial optimization problems.
 
 * General Structure
+
+Most backtracking solutions follow a general structure. They are tuned to solve a particular problem by writing "black box procedures". These "black box procedures" define the nature of partial candidates and how they are extended to complete solutions. The key in solving any backtracking problems is to generate each possible configuration/complete solution exactly once. Avoiding both repetitions and missing configurations/complete solutions means that we must define a systematic generation order.
+
+We model our partial solution as a vector ~A(a1...aN)~ where each element is taken for a Set S. Such a vector might represent an arrangement where ai contains the ith element of the permutation. Or, the vector might represent a given subset, where ai is true if and only if the ith element is present in the subset. At each step in the backtracking algorithm, try to extend a given partial solution ~A(a1....ak)~ by adding another element at the end. After extending it, we must test whether what we now have is a solution: if so, we should print it or count it. If not, we must check whether the partial solution is still potentially extendible to some complete solution.
+
+Backtracking constructs a tree of partial solutions, where each vertex represents a partial solution. There is an edge from x to y if node y was created by advancing from x. The process of constructing the solutions corresponds exactly to doing a depth-first traversal of the backtrack tree.
+
+#+NAME: General Structure
+#+BEGIN_SRC java
+    boolean finished = false;
+
+    void bt(int[] A, int k, data input) { // input is a placeholder for any information we want to pass into the functions
+        if(isSolution(A,k, nums)) { // tests whether the first k elements of int[] A form a complete solution for the given problem.
+            processSolution(A,k, input); // Process a complete solution once constructed, i.e. print, add it to a outlist, count etc.
+        } else {
+            k = k + 1;
+            // Returns a set of possible candidates for the kth poition, given the contents of first k-1 positions in A.
+            List<Integer> candidates = constructCandidate(A, k, input); // input is just a placeholder to pass in info into this function.
+            for(int c : candidates) {
+                A[k] = c;
+                make_move(A, k, input); // Make and unmake routines enable us to modify a data structure in response to the latest move. i.e. updating a chess board after placing a queen in N-Queens problem. This fns are empty in most problems.
+                bt(A, k, input); // dfs
+                unmake_move(A, k, input);
+                if(finished) return; // terminate early, if needed.
+            }
+        }
+    }
+#+END_SRC
 
 * Examples
