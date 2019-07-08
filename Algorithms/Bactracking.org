@@ -28,7 +28,7 @@ Backtracking constructs a tree of partial solutions, where each vertex represent
         if(isSolution(A,k, nums)) { // tests whether the first k elements of int[] A form a complete solution for the given problem.
             processSolution(A,k, input); // Process a complete solution once constructed, i.e. print, add it to a outlist, count etc.
         } else {
-            k = k + 1;
+            k = k + 1; // Not that we start filling from A[1]
             // Returns a set of possible candidates for the kth poition, given the contents of first k-1 positions in A.
             List<Integer> candidates = constructCandidate(A, k, input); // input is just a placeholder to pass in info into this function.
             for(int c : candidates) {
@@ -43,3 +43,110 @@ Backtracking constructs a tree of partial solutions, where each vertex represent
 #+END_SRC
 
 * Examples
+
+** Permutations
+LeetCode: [[https://leetcode.com/problems/permutations/][Permutations]]
+
+#+BEGIN_SRC java
+class Solution {
+    List<List<Integer>> resCon;
+    public List<List<Integer>> permute(int[] nums) {
+        resCon = new ArrayList<>();
+        int[] A = new int[nums.length + 1];
+        bt(A, 0, nums);
+        return resCon;
+    }
+
+    void bt(int[] A, int k, int[] nums) {
+        if(isSolution(A,k, nums)) {
+            processSolution(A,k, nums);
+        } else {
+            k = k + 1;
+            List<Integer> candidates = constructCandidate(A, k, nums);
+            for(int c : candidates) {
+                A[k] = c;
+                bt(A, k, nums);
+            }
+        }
+    }
+
+    boolean isSolution(int[] A, int k, int[] nums) {
+        return k == nums.length;
+    }
+
+    void processSolution(int[] A, int k, int[] nums) {
+        List<Integer> res = new ArrayList<Integer>(k);
+        for(int i = 1; i <= k; ++i) {
+            res.add(nums[A[i]]);
+        }
+        resCon.add(res);
+    }
+
+    List<Integer> constructCandidate(int[] A, int k, int[] nums) {
+        List<Integer> res = new ArrayList<Integer>(nums.length - k);
+        boolean[] inSol = new boolean[nums.length];
+        for(int i = 0; i < nums.length; ++i) {
+            inSol[i] = false;
+        }
+        for(int i = 1; i < k; ++i) {
+            inSol[A[i]] = true; // Make a note of what elements are part of the solution.
+        }
+        for(int i = 0; i < nums.length; ++i) {
+            if(!inSol[i]) // elements that are not already present in the partial solution become candidates for the next position
+                res.add(i);
+        }
+        return res;
+    }
+}
+#+END_SRC
+
+** Subsets / Combinations
+LeetCode: [[https://leetcode.com/problems/subsets/][Subsets]]
+
+#+BEGIN_SRC python
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    List<List<Integer>> res;
+    List<Boolean> candidates;
+    public List<List<Integer>> subsets(int[] nums) {
+        res = new ArrayList<>();
+        candidates = new ArrayList<>(2);
+        candidates.add(true);
+        candidates.add(false);
+        bt(new boolean[nums.length], 0, nums);
+        return res;
+    }
+
+    private void bt(boolean[] partialSolution, int pos, int[] nums) {
+        if (accept(pos, nums.length)) {
+            processSolution(partialSolution, nums);
+        } else {
+            List<Boolean> candidates = constructCandidates();
+            for (boolean candidate : candidates) {
+                partialSolution[pos] = candidate;
+                bt(partialSolution, pos + 1, nums);
+            }
+        }
+    }
+
+    private List<Boolean> constructCandidates() {
+        return candidates;
+    }
+
+    private void processSolution(boolean[] partialSolution, int[] nums) {
+        ArrayList<Integer> solution = new ArrayList<>();
+        for (int i = 0; i < partialSolution.length; i++) {
+            if (partialSolution[i]) {
+                solution.add(nums[i]);
+            }
+        }
+        res.add(solution);
+    }
+
+    private boolean accept(int pos, int nums) {
+        return pos == nums;
+    }
+}
+#+END_SRC
