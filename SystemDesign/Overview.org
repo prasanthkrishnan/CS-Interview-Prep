@@ -1,0 +1,37 @@
+#+TITLE: System Design Overview
+#+AUTHOR: Prasanth Krishnan
+#+EMAIL: knp281192@gmail.com
+#+DESCRIPTION: This file contains my notes system-design-primer.
+#+OPTIONS: toc:2
+
+* VSPs - EC2 etc
+
+* Vertical scaling vs Horizontal scaling.
+** vertical scaling
+Throwing moneyu to get bigger machines
+
+** Horizontal scaling
+- Adding more cheaper machines
+- It was easier to have website hosted a single machine, but with vertical scaling we have multiple machines. How to let customer know about all these group of machines ? - DNS.
+- We also want to distribute the requests in a balanced way to all the web hosts - Put a Load balancer before it.
+
+* DNS
++ DNS - Domain name server, maps domain names to ip addresses.
++ If there are multiple back end hosts then, they will be behind a load balancer.
++ If there is a Load balancer then DNS should resolve to LB hosts.
+
+* Load Balancer 
++ Load balancer is a set of hosts that site in betwwen the client and the backend web hosts.
++ LB provides abstracts that there are multiple backend hosts from the client.
++ It handles and http request and then routes them according to the routing policy.
++ commonly used routing policies: Roud robin, least connections etc.
++ To route requests, LB has to know which backend hosts are alive -- health checks.
++ In complex routing policies, it also needs to query the backend hosts for data. i.e. policy - send request to the least busy server. LB has to know the load(CPU used) on each machine.
++ With LB, back end hosts can be assigned only with private ip(remain in a local network), thus enhancing the security.
++ Other uses of LB is to route traffic based on type of request to different set of hosts(different service). i.e.
+
+** why not use DNS to load balance among backend hosts?
+Lets say, we have a DNS based LB solution, which is gaurenteed to return the ip address of the backend hosts in a round robin fashion. This solution works, client taks to DNS server, it gives back a backend ip address and client contacts the backend host to get the content. But there are problems with this approach.
++ DNS servers doesnt talk to the backend hosts so they cant do complicated routing polcies.
++ Its not easy to update DNS when a backend hosts fails or when adding new hosts.
++ Operating system also cache the DNS query and its result, that means second requests from the same client maching will not do a DNS query but reuse the result from previous query, thus failing to load balancing.
