@@ -1,4 +1,4 @@
-#+TITLE: System Design Overview
+#+TITLE: System design overview of typical website
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
 #+DESCRIPTION: This file contains my notes system-design-primer.
@@ -21,7 +21,7 @@ Throwing moneyu to get bigger machines
 + If there is a Load balancer then DNS should resolve to LB hosts.
 
 * Load Balancer 
-+ Load balancer is a set of hosts that site in betwwen the client and the backend web hosts.
++ Load balancer is a set of hosts that sits in between the client and the backend web hosts.
 + LB provides abstracts that there are multiple backend hosts from the client.
 + It handles and http request and then routes them according to the routing policy.
 + commonly used routing policies: Roud robin, least connections etc.
@@ -35,3 +35,30 @@ Lets say, we have a DNS based LB solution, which is gaurenteed to return the ip 
 + DNS servers doesnt talk to the backend hosts so they cant do complicated routing polcies.
 + Its not easy to update DNS when a backend hosts fails or when adding new hosts.
 + Operating system also cache the DNS query and its result, that means second requests from the same client maching will not do a DNS query but reuse the result from previous query, thus failing to load balancing.
+
+** How to maintain session state, like shopping cart / user login ?
+Prior to LB, all the state can be stored in the single machine's HDD. But with load balancing, subsequent request might go to different server, there by cant use reuse session state. How about storing the session state outside the servers in a Database (duh!). But the next question is how do we prevent, the DB from crashing? Will look at it in replication.
+
+** Can we use cokkies to store the address of the backend server that has the stored session state ?
+If we store the address of the backend server in cookies and let LB use that info to route the request we could technically use cookies to route traffic to the backend server with the session informaion. But cookies can be user controlled, thus a harmful user can exploit it to DDOS the backend server. User could disable cookie in their browser.
+
+** How are load balancers implemented ?
+*** Software LB
++ AWS ELB / ALB / NLB
++ HAProxy
++ Ngnix
+*** Hardware LB
++ Cisco
++ Citrix
+  
+* Caching
+** Can Precompute all pages and store them as static htmls and just vend them upon request?
+yes we can, in this approach, backend servers are just file vendors. Backend servers just respond with the static html page mathcing the request. But there are downsides to this:
++ This requires creating a lot of static pages and each of them have the same repeated html content but only the values changes.
++ If we have to change the design of the page, we have modify all the static pages.
+
+The typical approach is to have templates(view) and let backend servers write the dynamic data(model) upon the template
+** Distributed caches Memcached / Redis
+
+
+* Replication
