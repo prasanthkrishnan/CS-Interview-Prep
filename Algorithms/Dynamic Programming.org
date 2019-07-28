@@ -73,6 +73,10 @@ class Solution {
 }
 #+end_src
 * When to use Dynamic Programming ?
++ For optimization problems which has a optimal sub structure property.
+  + To find out if there is a optimal sub structure, it usually involves in formulating the recursion.
++ There must be a cycle in the recursion. Or the search space should be a DAG (considering each sub instance of the problem as a vertices).
++ We should be able to find the answer to an instance(f(i)=instance) of the problem in polynomial time.
 
 * Steps to write a DP solution.
 
