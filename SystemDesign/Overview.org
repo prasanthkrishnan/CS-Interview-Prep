@@ -1,4 +1,4 @@
-#+TITLE: System design overview of typical website
+#+TITLE: System design overview of a typical website
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
 #+DESCRIPTION: This file contains my notes system-design-primer.
@@ -51,7 +51,27 @@ If we store the address of the backend server in cookies and let LB use that inf
 + Cisco
 + Citrix
   
+  
+* Databases
+Once the application servers can horizontally scale (with the help of a DB storing the state), the next bottle neck will be the database.
+- Having only one instance as your DB poses a availabity and scalability problem.
+- Availabity problem can be solved by having (read) replicas to the master. This doesnt solve the scalability problem especially for writes.
+** DB Sharding
+Scalabity can be mitigated somewhat by sharding the DB into multiple instances. But this requires careful thought every time it has to be sharded.
+** Moving to NoSQL
+NoSQL stores data in a denormalized format. The joins are done in the application code rather than the DB. NoSQL DB like DDB, mongoDB scale very well because of this and looser consistency gaureentees.
+
 * Caching
+** Caching DB queries
+Pros - DO the heavy compution like join once and store it the cache and reuse it.
+Cons :
+- If the data changes then the cached query result is invalid and have to recompute.
+- There might more combinations of queries ur application supports than the objects themselves.
+** Caching Data objects
+Pros 
+- No need to store every combination of the query.
+- Leverage asychronous refreshing by a army of workers who assemble the objects stored in the cache from database.
+Cons - Query have to be re computed.
 ** Can Precompute all pages and store them as static htmls and just vend them upon request?
 yes we can, in this approach, backend servers are just file vendors. Backend servers just respond with the static html page mathcing the request. But there are downsides to this:
 + This requires creating a lot of static pages and each of them have the same repeated html content but only the values changes.
@@ -60,5 +80,22 @@ yes we can, in this approach, backend servers are just file vendors. Backend ser
 The typical approach is to have templates(view) and let backend servers write the dynamic data(model) upon the template
 ** Distributed caches Memcached / Redis
 
+* Asynchornism
+** Precomputing
+If there are heavy work that needs to be done, instead of starting one on demand, pre compute and store the result. Like convert dynamic pages into static ones as possible and store them. Return the precomputed stuff on demand. This makes the request time very less and makes the website very snappy. The disadvantage is that content may change and that means we have compute the result again. Have a periodic cron job whihc does this.
+** Processing heavy stuff in the background and letting customer know when its done.
+when a customer wants to do a heavy computation, which cannot be pre computed we do it asychronously. Accept the request put it into a queue like SQS or rabbitMQ and send a confirmation to the customer tellking them it is in progress. Have a bunhc of workers which process the queue and publish the result. Cusotmer can be notified when it done. This can be in a status web page which peridically polls if the job is done or not or via notifications like SNS.
 
-* Replication
+* High level Tradeoffs
+** Performance vs Scalability
+A service is scalable if adding more resources ==> increases performance. Some times the service needs to be alwasy-on, so to make it reliable redudancy is introduced. A service is also considered scalable if its performance doesnt degrade when more resources are introduced for redudancy.
+** Latency vs throughput
+Latency is the time to perform some action or to produce some result. (ms)
+Throughput is the number of such actions or results per unit of time. (tps)
+Generally, you should aim for maximal throughput with acceptable latency. (y tps that can achieved with P99 latency x)
+
+** Availabity vs Consistency
+From CAP theorem there can only be two gaurentees supported by a distributed system. 
+- CP
+- AP
+- http://ksat.me/a-plain-english-introduction-to-cap-theorem/
