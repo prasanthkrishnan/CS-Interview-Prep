@@ -99,3 +99,35 @@ From CAP theorem there can only be two gaurentees supported by a distributed sys
 - CP
 - AP
 - http://ksat.me/a-plain-english-introduction-to-cap-theorem/
+
+*** Consistency patterns
+**** Replicated Data consistency explained through Baseball
+[[http://pages.cs.wisc.edu/~remzi/Classes/739/Fall2018/Papers/baseball-13.pdf][Paper]]
+- *Strong Consistency* - All reads return the latest value of an object following a write.
+- *Eventually consistency* - Reads return stale data, i.e. The  data  returned  by a read operation is the value of the object  at  some  past  point  in  time  but not  necessarily  the  latest  value. This is done in favour of better performance and availability. This is usually implemented by asychronous replication.
+- Recent systems, recognizing the need to support different classes of applications, have been designed with a choice of operations for accessing cloud storage.   
+***** Flavors of Read Consistency Gaureentees. 
+| Strong Consistency   | See all previous writes.                            |
+| Eventual Consistency | See subset of previous writes.                      |
+| Consistent Prefix    | See initial sequence of writes.                     |
+| Bounded Staleness    | See all “old” writes.                               |
+| Monotonic reads      | See increasing subset of writes over multiple reads |
+| Read My Writes       | See all writes performed by reader                  |
+
+***** Read Gaurentees for various clients
+| Clients              | Desc                                             | Read Gaurentees                     |
+|----------------------+--------------------------------------------------+-------------------------------------|
+| Official scorekeeper | a single person updating the score for every run | Read My Writes                      |
+| Umpire               | Needs the score only before the last innings.    | Strong Consistency                  |
+| Radio reporter       | peridically announces scores during the game     | Consistent Prefix & Monotonic reads |
+| Sports writer        | Writes articles for the morning news paper       | Bounded Staleness                   |
+| Statistician         | Writes stats about the team after the game       | Strong Consistency, read My Writes  |
+| Stat watcher         | Person occasionally visiting teams old stats     | Eventual Consistency                |
+
+***** Conclusion
+- All of the six presented consistency guarantees are useful. 
+- Different clients may want different consistencies even when accessing the same data.
+  - Thus a particular type of data is not associated with a consistency gaurentee. i.e. banking info with strong consistency.
+- Clients  should  be  able  to  choose  their desired consistency.
+
+*** Availabity patterns
