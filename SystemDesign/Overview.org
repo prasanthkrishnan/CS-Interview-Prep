@@ -131,3 +131,13 @@ From CAP theorem there can only be two gaurentees supported by a distributed sys
 - Clients  should  be  able  to  choose  their desired consistency.
 
 *** Availabity patterns
+**** Fail over
+***** Active passive / master slave
+With active-passive fail-over, heartbeats are sent between active and passive server on standby. If the heartbeat is interrupted, the passive server takes over the active's IP address and resumes service. The length of downtime is determined by whether the passive server is already running in 'hot' standby or whether it needs to start up from 'cold' standby. Only the active server handles traffic.
+***** Active Active / master master 
+In active-active, both servers are managing traffic, spreading the load between them.
+**** Replication
+Discussed in DB section
+**** Availabity definition
+Availability is often quantified by uptime (or downtime) as a percentage of time the service is available. 2-9s=99.0 3-9s=99.9 4-9s=99.99
+
