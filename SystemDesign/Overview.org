@@ -1,7 +1,7 @@
 #+TITLE: System design overview of a typical website
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
-#+DESCRIPTION: This file contains my notes system-design-primer.
+#+DESCRIPTION: This file contains my notes from various sources, mainly system-design-primer.
 #+OPTIONS: toc:2
 
 * VSPs - EC2 etc
