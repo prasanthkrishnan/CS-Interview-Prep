@@ -11,7 +11,7 @@ A Domain Name System (DNS) translates a domain name such as www.example.com to a
 - Your router or ISP provides information about which DNS server(s) to contact when doing a lookup
 - Lower level DNS servers cache mappings, sometimes OS and browser also cache dns mappings with a TTL.
 * Architecture
-#+begin_src plantuml :file ./DNS-basic.png
+#+begin_src plantuml :file ./images/DNS-basic.png
 title Basic DNS resolution
 actor client
 client -> "ISP DNS server" as ISP : www.google.com
@@ -23,7 +23,7 @@ client --> "192.168.1.10" as Google : /index.html
 Google --> client : /index.html
 #+end_src    
 #+RESULTS:
-[[file:./DNS-basic.png]]
+[[file:./images/DNS-basic.png]]
 
 ** DNS domain names
 
@@ -34,8 +34,7 @@ Google --> client : /index.html
 - *CNAME (canonical)* - Points a name to another name or CNAME (example.com to www.example.com) or to an A record.
 
 ** DNS Queries
-
-#+begin_src plantuml :file ./DNS-detailed.png
+#+begin_src plantuml :file ./images/DNS-detailed.png
 title DNS resolution
 actor client
 client -> "ISP DNS server" as ISP : www.google.com
@@ -46,3 +45,6 @@ ISP -> client : "192.168.1.10"
 client --> "192.168.1.10" as Google : /index.html
 Google --> client : /index.html
 #+end_src    
+
+#+RESULTS:
+[[file:./images/DNS-detailed.png]]
