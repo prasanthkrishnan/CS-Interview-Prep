@@ -182,15 +182,6 @@ class Solution {
             return false;
         return true;
     }
-
-    private List<Character> candidates(String b, int open, int close, int n) {
-        List<Character> candidates = new ArrayList<>(2);
-        if(open < n)
-            candidates.add('(');
-        if(close < open)
-            candidates.add(')');
-        return candidates;
-    }
 }
 #+END_SRC
 
