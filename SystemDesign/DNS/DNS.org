@@ -2,8 +2,7 @@
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
 #+DESCRIPTION: This file contains my notes from various sources, mainly system-design-primer
-#+OPTIONS: toc:2
-#+STARTUP: inlineimages
+#+OPTIONS: toc:2 #+STARTUP: inlineimages
 
 A Domain Name System (DNS) translates a domain name such as www.example.com to an IP address.
 
@@ -34,17 +33,16 @@ Google --> client : /index.html
 - *CNAME (canonical)* - Points a name to another name or CNAME (example.com to www.example.com) or to an A record.
 
 ** DNS Queries
-#+begin_src plantuml :file ./images/DNS-detailed.png
-title DNS resolution
-actor client
-client -> "ISP DNS server" as ISP : www.google.com
-ISP -> "Root DNS server" as Root : www.google.com
-Root -> ISP : "192.168.1.10"
-note right: stores it in cache
-ISP -> client : "192.168.1.10"
-client --> "192.168.1.10" as Google : /index.html
-Google --> client : /index.html
-#+end_src    
+There are two types of DNS queries: i.e Iterative and Recursive
 
-#+RESULTS:
-[[file:./images/DNS-detailed.png]]
+[[file:./images/DNS-detailed.gif]]
+
+The figure shows a number of queries were used to determine the IP address for www.whitehouse.gov. The query sequence is described as follows:
+- Recursive query for www.whitehouse.gov (A resource record)
+- Iterative query for www.whitehouse.gov (A resource record)
+- Referral to the .gov name server (NS resource records, for .gov); for simplicity, iterative A queries by the DNS server (on the left) to resolve the IP addresses of the Host names of the name server’s returned by other DNS servers have been omitted.
+- Iterative query for www.whitehouse.gov (A resource record)
+- Referral to the whitehouse.gov name server (NS resource record, for whitehouse.gov)
+- Iterative query for www.whitehouse.gov (A resource record)
+- Answer to the iterative query from whitehouse.gov server (www.whitehouse.gov’s IP address)
+- Answer to the original recursive query from local DNS server to resolver (www.whitehouse.gov’s IP address)
