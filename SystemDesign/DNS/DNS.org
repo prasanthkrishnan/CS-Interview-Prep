@@ -2,7 +2,8 @@
 #+AUTHOR: Prasanth Krishnan
 #+EMAIL: knp281192@gmail.com
 #+DESCRIPTION: This file contains my notes from various sources, mainly system-design-primer
-#+OPTIONS: toc:2 #+STARTUP: inlineimages
+#+OPTIONS: toc:2
+#+STARTUP: inlineimages
 
 A Domain Name System (DNS) translates a domain name such as www.example.com to an IP address.
 
